@@ -128,7 +128,7 @@ if run:
                 st.session_state.last_landing_time = current_time
                 status_box.warning("DOWN detected — checking landing surface")
 
-                PHONE_CAM_URL = "http://100.115.254.39:8080/video"
+                PHONE_CAM_URL = "http://100.84.18.30:8080/video"
 
                 landing_cam = cv2.VideoCapture(PHONE_CAM_URL)
                 time.sleep(0.5)  # allow stream to initialize
