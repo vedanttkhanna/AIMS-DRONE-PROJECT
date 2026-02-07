@@ -5,9 +5,7 @@ import numpy as np
 import time
 from mediapipe.python.solutions import hands as mp_hands
 
-# ============================================================
-# STREAMLIT SETUP
-# ============================================================
+
 st.set_page_config(page_title="Gesture-Controlled Safe Drone Landing", layout="centered")
 st.title("Gesture-Controlled Drone with Automatic Safe Landing")
 
@@ -23,17 +21,13 @@ frame_window = st.image([])
 status_box = st.empty()
 metrics_box = st.empty()
 
-# ============================================================
-# STATE
-# ============================================================
+
 if "last_landing_time" not in st.session_state:
     st.session_state.last_landing_time = 0  # cooldown
 
 LANDING_COOLDOWN = 2.0  # seconds
 
-# ============================================================
-# MEDIAPIPE HANDS
-# ============================================================
+
 hands_detector = mp_hands.Hands(
     static_image_mode=False,
     max_num_hands=1,
@@ -41,17 +35,13 @@ hands_detector = mp_hands.Hands(
     min_tracking_confidence=0.3
 )
 
-# ============================================================
-# GESTURE CAMERA (LAPTOP)
-# ============================================================
+
 if "gesture_cam" not in st.session_state:
     st.session_state.gesture_cam = cv2.VideoCapture(0)
 
 gesture_cam = st.session_state.gesture_cam
 
-# ============================================================
-# DIRECTION LOGIC
-# ============================================================
+
 def get_direction(landmarks):
     wrist = landmarks[0]
     index_tip = landmarks[8]
@@ -64,9 +54,7 @@ def get_direction(landmarks):
     else:
         return "DOWN" if dy > 0 else "UP"
 
-# ============================================================
-# LANDING SURFACE ANALYSIS
-# ============================================================
+
 def assess_landing_surface(frame):
     h, w, _ = frame.shape
     roi = frame[h // 3 : 2 * h // 3, w // 3 : 2 * w // 3]
@@ -87,9 +75,6 @@ def assess_landing_surface(frame):
 
     return SAFE, edge_density, texture_variance, bright_ratio
 
-# ============================================================
-# MAIN LOOP (LIVE FEED)
-# ============================================================
 if run:
     while run:
         ret, frame = gesture_cam.read()
@@ -103,7 +88,7 @@ if run:
 
         current_time = time.time()
 
-        # ----------------- GESTURE DETECTION -----------------
+       
         if result.multi_hand_landmarks:
             hand_landmarks = result.multi_hand_landmarks[0]
             direction = get_direction(hand_landmarks.landmark)
@@ -123,12 +108,12 @@ if run:
                 2
             )
 
-            # ----------------- AUTO LANDING CHECK -----------------
+            
             if direction == "DOWN" and current_time - st.session_state.last_landing_time > LANDING_COOLDOWN:
                 st.session_state.last_landing_time = current_time
                 status_box.warning("DOWN detected — checking landing surface")
 
-                PHONE_CAM_URL = "http://100.84.18.30:8080/video"
+                PHONE_CAM_URL = "http://100.125.178.65:8080/video"
 
                 landing_cam = cv2.VideoCapture(PHONE_CAM_URL)
                 time.sleep(0.5)  # allow stream to initialize
